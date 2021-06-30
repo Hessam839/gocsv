@@ -36,7 +36,9 @@ func WriteToCSV(fileName string, strct interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer csvFile.Close()
+	defer func() {
+		_ = csvFile.Close()
+	}()
 
 	csvWriter := csv.NewWriter(csvFile)
 
