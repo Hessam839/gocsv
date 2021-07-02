@@ -11,22 +11,20 @@ import (
 func GetHeader(strct interface{}) []string {
 	var header []string
 	kind := reflect.TypeOf(strct).Kind()
+	var elem reflect.Value
 	switch kind {
 	case reflect.Slice:
-		elem := reflect.ValueOf(strct).Index(0)
-
-		for j := 0; j < elem.NumField(); j++ {
-			tag := elem.Type().Field(j).Tag.Get("csv")
-			header = append(header, tag)
-			fmt.Println(tag)
-		}
+		elem = reflect.ValueOf(strct).Index(0)
 	case reflect.Struct:
-		elem := reflect.ValueOf(strct)
-		for j := 0; j < elem.NumField(); j++ {
-			tag := elem.Type().Field(j).Tag.Get("csv")
-			header = append(header, tag)
-			fmt.Println(tag)
+		elem = reflect.ValueOf(strct)
+	}
+	for j := 0; j < elem.NumField(); j++ {
+		tag := elem.Type().Field(j).Tag.Get("csv")
+		if tag == `-` {
+			break
 		}
+		header = append(header, tag)
+		fmt.Println(tag)
 	}
 	return header
 }
@@ -56,6 +54,10 @@ func WriteToCSV(fileName string, strct interface{}) error {
 
 			for i := 0; i < elem.NumField(); i++ {
 				value := elem.Field(i)
+				tag := elem.Type().Field(i).Tag.Get(`csv`)
+				if tag == `-` {
+					break
+				}
 				switch elem.Field(i).Kind() {
 				case reflect.String:
 					str = append(str, value.Interface().(string))
@@ -72,6 +74,10 @@ func WriteToCSV(fileName string, strct interface{}) error {
 		var str []string
 		for i := 0; i < elem.NumField(); i++ {
 			value := elem.Field(i)
+			tag := elem.Type().Field(i).Tag.Get(`csv`)
+			if tag == `-` {
+				break
+			}
 			switch elem.Field(i).Kind() {
 			case reflect.String:
 				str = append(str, value.Interface().(string))

@@ -5,7 +5,7 @@ import "testing"
 type Q struct {
 	Name   string `csv:"name"`
 	Family string `csv:"family"`
-	Age    int    `csv:"age"`
+	Age    int    `csv:"-"`
 }
 
 func Test_GetHeader(t *testing.T) {
